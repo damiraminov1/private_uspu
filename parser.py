@@ -13,7 +13,7 @@ class Parser:
     def _get_html(url):
         session = HTMLSession()
         r = session.get(url=url)
-        r.html.render(timeout=30, sleep=10)
+        r.html.render(timeout=30, sleep=5)
         if Parser._server_is_respond(r):
             return r.html.html
         else:
@@ -56,27 +56,24 @@ class Parser:
                 print(e)
 
     @staticmethod
-    def get_content(url: str, group: str, day: dict) -> dict:
+    def get_content(url: str, group: str) -> dict:
         while True:
             try:
                 soup = Parser._get_soup(url=url + group)
                 stud_r = soup.find('div', attrs={'class': 'stud-r'})
-                items = stud_r.find_all('div', attrs={'class': 'rasp-item'})[
-                    Parser.get_available_days(url, group).index(day)]  # paste here day
-                lessons_count = len(items.find_all('span', attrs={'class': 'para-time'}))
-                lessons = list()
-                for i in range(lessons_count):
-                    data = items.find_all('p')[i].getText().split('\n')  # list with lesson, auditorium, teacher, subgroup
-                    lessons.append({
-                        'time': items.find_all('span', attrs={'class': 'para-time'})[i].getText(),
-                        # paste here para time by index,
-                        'content': data
-                    })
-                result = {
+                new_data = {
                     'update': stud_r.find('script').get_text().split(r"$('.stud-r .rasp-update').html('")[1][:-8],
-                    'lessons': lessons
+                    'days': list()
                 }
-                return result
+                days = stud_r.find_all('div', attrs={'class': 'rasp-item'})
+                for raw_day in days:
+                    lessons_raw = raw_day.find_all('span', attrs={'class': 'para-time'})
+                    lessons = list()
+                    for idx, x in enumerate(lessons_raw):
+                        data = raw_day.find_all('p')[idx].getText().split('\n')
+                        lessons.append(f'{x.getText()} \n ' + str('\n').join(data))
+                    new_data['days'].append(lessons)
+                return new_data
             except BaseException as e:
                 time.sleep(5)
                 print(e)
@@ -84,20 +81,15 @@ class Parser:
 
 # EXAMPLES
 # print(Parser.get_available_days(url=Config.URL, group='РиА-1931'))
-# print(Parser.get_content(url=Config.URL, group='РиА-1931', day={'date': '15 февраля', 'week': 'Ср'}))
-
+# print(datetime.now().strftime('%d-%b-%Y (%H:%M:%S.%f)'))
+# print(Parser.get_content(url=Config.URL, group='РиА-1931'))
+# print(datetime.now().strftime('%d-%b-%Y (%H:%M:%S.%f)'))
 data = 'TECHNICAL INFO \n'
 data += datetime.today().strftime("%d-%b-%Y (%H:%M:%S.%f)")
 data += 'TECHNICAL INFO \n'
-days = Parser.get_available_days(url=Config.URL, group='РиА-1931')
-for day in days:
-    data += f'{day["date"]} {day["week"]} \n\n'
-    lessons = Parser.get_content(url=Config.URL, group="РиА-1931", day=day)["lessons"]
-    for lesson in lessons:
-        data += f'{lesson["time"]} \n'
-        for info in lesson["content"]:
-            data += f'{info} \n'.lstrip()
+data_lst = Parser.get_content(url=Config.URL, group="РиА-1931")
+data += f'{data_lst["update"]} \n'
+for day in data_lst["days"]:
+    for lesson in day:
+        data += f'{lesson}'
     data += '='*55
-
-with open('content.pkl', 'wb') as f:
-    pickle.dump(data, f)

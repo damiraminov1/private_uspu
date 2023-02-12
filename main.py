@@ -31,8 +31,9 @@ async def start(message: types.Message):
 @dp.message_handler(content_types='text')
 async def callback_handler(callback: types.CallbackQuery):
     if callback:
-        tech_time = loaded_str.split('TECHNICAL INFO \n')[1]
-        if tech_time < datetime.today().strftime("%d-%b-%Y (%H:%M:%S.%f)"):
+        tech_time = datetime.strptime(loaded_str.split('TECHNICAL INFO \n')[1], "%d-%b-%Y (%H:%M:%S.%f)")
+        now = datetime.now()
+        if tech_time < now:
             await bot.send_message(chat_id=callback.from_user.id, text="YES ITS TRUE")
         data = loaded_str.split('='*55)
         for message in data:
