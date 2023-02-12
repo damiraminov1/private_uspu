@@ -62,7 +62,7 @@ class Parser:
                 soup = Parser._get_soup(url=url + group)
                 stud_r = soup.find('div', attrs={'class': 'stud-r'})
                 new_data = {
-                    'update': stud_r.find('script').get_text().split(r"$('.stud-r .rasp-update').html('")[1][:-8],
+                    'update': stud_r.find('script').get_text().split(r"$('.stud-r .rasp-update').html('")[1][:-20],
                     'days': list()
                 }
                 days = stud_r.find_all('div', attrs={'class': 'rasp-item'})
@@ -71,7 +71,10 @@ class Parser:
                     lessons = list()
                     for idx, x in enumerate(lessons_raw):
                         data = raw_day.find_all('p')[idx].getText().split('\n')
-                        lessons.append(f'{x.getText()} \n ' + str('\n').join(data))
+                        dd = f'{x.getText()} \n '
+                        for element in data:
+                            dd += f'{element.strip()} \n'
+                        lessons.append(dd)
                     new_data['days'].append(lessons)
                 return new_data
             except BaseException as e:
@@ -89,7 +92,13 @@ data += datetime.today().strftime("%d-%b-%Y (%H:%M:%S.%f)")
 data += 'TECHNICAL INFO \n'
 data_lst = Parser.get_content(url=Config.URL, group="РиА-1931")
 data += f'{data_lst["update"]} \n'
+data += '=' * 55
 for day in data_lst["days"]:
+    data += '\n'
     for lesson in day:
-        data += f'{lesson}'
-    data += '='*55
+        correct_lesson = lesson.lstrip()
+        data += f'{correct_lesson}'
+    data += '=' * 55
+    print(data)
+with open('content.pkl', 'wb') as f:
+    pickle.dump(data, f)
