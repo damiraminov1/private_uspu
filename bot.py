@@ -1,3 +1,4 @@
+import os
 import pickle
 import datetime
 
@@ -5,9 +6,6 @@ from aiogram.utils import exceptions, executor
 from aiogram import Bot, Dispatcher, types
 
 from config import Config
-
-with open('content.pkl', 'rb') as f:
-    loaded_str = pickle.load(f)
 
 
 bot = Bot(token=Config.TOKEN)
@@ -31,7 +29,9 @@ async def start(message: types.Message):
 @dp.message_handler(content_types='text')
 async def callback_handler(callback: types.CallbackQuery):
     if callback:
-        tech_time = datetime.datetime.strptime(loaded_str.split('TECHNICAL INFO \n')[1], "%d-%b-%Y (%H:%M:%S.%f)")
+        with open("DATA.txt", "r") as text_file:
+            loaded_str = text_file.read()
+        tech_time = datetime.datetime.strptime(loaded_str.split('TECHNICAL INFO \n')[1], '%d-%b-%Y (%H:%M:%S.%f)')
         now = datetime.datetime.now()
         delta = now - tech_time
         warning_notification = delta >= datetime.timedelta(minutes=7)
@@ -47,7 +47,6 @@ async def callback_handler(callback: types.CallbackQuery):
                      f" https://uspu.ru/education/eios/schedule/?group_name=РиА-1931"
             )
         data = loaded_str.split('TECHNICAL INFO \n')[2].split('='*55)
-        print(data)
         for message in data:
             if message:
                 await bot.send_message(chat_id=callback.from_user.id, text=message)

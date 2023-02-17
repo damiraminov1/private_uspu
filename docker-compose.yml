@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  bot:
+    build: .
+    restart: on-failure
+    container_name: "app_bot"
+    command: python run.py
+    volumes:
+      - .:/private_uspu_bot
+    depends_on:
+      - parser
+
+  parser:
+    build: .
+    restart: on-failure
+    container_name: "app_parser"
+    command: python parser.py
+    volumes:
+      - .:/private_uspu_bot

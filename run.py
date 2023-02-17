@@ -1,3 +1,3 @@
-from main import dp, executor
+from bot import dp, executor
 
 executor.start_polling(dp, skip_updates=True)

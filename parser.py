@@ -81,24 +81,34 @@ class Parser:
                 time.sleep(5)
                 print(e)
 
+    @staticmethod
+    def create_data() -> str:
+        while True:
+            try:
+                data = 'TECHNICAL INFO \n'
+                data += datetime.today().strftime("%d-%b-%Y (%H:%M:%S.%f)")
+                data += 'TECHNICAL INFO \n'
+                data_lst = Parser.get_content(url=Config.URL, group="РиА-1931")
+                data += f'{data_lst["update"]} \n'
+                data += '=' * 55
+                for day in data_lst["days"]:
+                    data += '\n'
+                    for lesson in day:
+                        correct_lesson = lesson.lstrip()
+                        data += f'{correct_lesson}'
+                    data += '=' * 55
+                return data
+            except:
+                continue
 
 # EXAMPLES
 # print(Parser.get_available_days(url=Config.URL, group='РиА-1931'))
 # print(datetime.now().strftime('%d-%b-%Y (%H:%M:%S.%f)'))
 # print(Parser.get_content(url=Config.URL, group='РиА-1931'))
 # print(datetime.now().strftime('%d-%b-%Y (%H:%M:%S.%f)'))
-data = 'TECHNICAL INFO \n'
-data += datetime.today().strftime("%d-%b-%Y (%H:%M:%S.%f)")
-data += 'TECHNICAL INFO \n'
-data_lst = Parser.get_content(url=Config.URL, group="РиА-1931")
-data += f'{data_lst["update"]} \n'
-data += '=' * 55
-for day in data_lst["days"]:
-    data += '\n'
-    for lesson in day:
-        correct_lesson = lesson.lstrip()
-        data += f'{correct_lesson}'
-    data += '=' * 55
-    print(data)
-with open('content.pkl', 'wb') as f:
-    pickle.dump(data, f)
+
+
+while True:
+    data = Parser.create_data()
+    with open("DATA.txt", "w") as text_file:
+        text_file.write(data)

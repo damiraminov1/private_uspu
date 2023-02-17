@@ -25,6 +25,7 @@ pyppeteer==1.0.2
 pyquery==2.0.0
 python-dotenv==0.21.1
 pytz==2022.7.1
+redis==4.5.1
 requests==2.28.2
 requests-html==0.10.0
 soupsieve==2.3.2.post1
