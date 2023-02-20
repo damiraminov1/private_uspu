@@ -12,7 +12,7 @@ class Parser:
     def _get_html(url):
         session = HTMLSession()
         r = session.get(url=url)
-        r.html.render(timeout=60, sleep=60)
+        r.html.render(timeout=120, sleep=60)
         if Parser._server_is_respond(r):
             return r.html.html
         else:
@@ -66,15 +66,18 @@ class Parser:
                 }
                 days = stud_r.find_all('div', attrs={'class': 'rasp-item'})
                 for raw_day in days:
+                    lessons_info = list()
+                    lessons_info.append(
+                        f"{str(raw_day.find('div', attrs={'class': 'rasp-week'}).getText())} "
+                        f"{str(raw_day.find('span', attrs={'class': 'rasp-day'}).getText())} \n")
                     lessons_raw = raw_day.find_all('span', attrs={'class': 'para-time'})
-                    lessons = list()
                     for idx, x in enumerate(lessons_raw):
                         data = raw_day.find_all('p')[idx].getText().split('\n')
                         dd = f'{x.getText()} \n '
                         for element in data:
                             dd += f'{element.strip()} \n'
-                        lessons.append(dd)
-                    new_data['days'].append(lessons)
+                        lessons_info.append(dd)
+                    new_data['days'].append(lessons_info)
                 return new_data
             except BaseException as e:
                 time.sleep(5)
@@ -99,12 +102,6 @@ class Parser:
                 return data
             except:
                 continue
-
-# EXAMPLES
-# print(Parser.get_available_days(url=Config.URL, group='РиА-1931'))
-# print(datetime.now().strftime('%d-%b-%Y (%H:%M:%S.%f)'))
-# print(Parser.get_content(url=Config.URL, group='РиА-1931'))
-# print(datetime.now().strftime('%d-%b-%Y (%H:%M:%S.%f)'))
 
 
 while True:
