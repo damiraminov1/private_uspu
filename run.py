@@ -1,3 +1,3 @@
 from bot import dp, executor
 
-executor.start_polling(dp, skip_updates=True)
+executor.start_polling(dp, timeout=60, skip_updates=True)
