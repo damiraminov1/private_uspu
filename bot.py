@@ -12,6 +12,11 @@ bot = Bot(token=Config.TOKEN)
 dp = Dispatcher(bot)
 
 
+def user_has_permission(user_id: int) -> bool:
+    if user_id == Config.OWN_ID or user_id == Config.USER_ID:
+        return True
+
+
 def get_start_markup() -> types.ReplyKeyboardMarkup:
     markup = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
     schedule_button = types.KeyboardButton('Расписание')
@@ -21,7 +26,7 @@ def get_start_markup() -> types.ReplyKeyboardMarkup:
 
 @dp.message_handler(commands='start')
 async def start(message: types.Message):
-    if message.from_user.id == Config.OWN_ID:
+    if user_has_permission(message.from_user.id):
         await message.reply(
             'Привет, Ксюшик❤️! Любое твое сообщение или кнопка - расписание',
             reply_markup=get_start_markup())
@@ -29,7 +34,7 @@ async def start(message: types.Message):
 
 @dp.message_handler(content_types='text')
 async def callback_handler(callback: types.CallbackQuery):
-    if callback and callback.from_user.id == Config.OWN_ID:
+    if callback and user_has_permission(callback.from_user.id):
         with open("DATA.txt", "r") as text_file:
             loaded_str = text_file.read()
         tech_time = datetime.datetime.strptime(loaded_str.split('TECHNICAL INFO \n')[1], '%d-%b-%Y (%H:%M:%S.%f)')
