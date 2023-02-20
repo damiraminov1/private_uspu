@@ -1,5 +1,4 @@
 from datetime import datetime
-import pickle
 import time
 
 from requests_html import HTMLSession

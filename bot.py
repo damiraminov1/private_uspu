@@ -1,15 +1,33 @@
-import os
-import pickle
 import datetime
 
-from aiogram.utils import exceptions, executor
+from aiogram.utils import executor
 from aiogram import Bot, Dispatcher, types
 
 from config import Config
 
-
 bot = Bot(token=Config.TOKEN)
 dp = Dispatcher(bot)
+
+
+def td_format(td_object: datetime) -> str:
+    seconds = int(td_object.total_seconds())
+    periods = [
+        ('year', 60 * 60 * 24 * 365),
+        ('month', 60 * 60 * 24 * 30),
+        ('day', 60 * 60 * 24),
+        ('hour', 60 * 60),
+        ('minute', 60),
+        ('second', 1)
+    ]
+
+    strings = []
+    for period_name, period_seconds in periods:
+        if seconds > period_seconds:
+            period_value, seconds = divmod(seconds, period_seconds)
+            has_s = 's' if period_value > 1 else ''
+            strings.append("%s %s%s" % (period_value, period_name, has_s))
+
+    return ", ".join(strings)
 
 
 def user_has_permission(user_id: int) -> bool:
@@ -45,7 +63,7 @@ async def callback_handler(callback: types.CallbackQuery):
             if warning_notification:
                 await bot.send_message(
                     chat_id=callback.from_user.id,
-                    text=f"WARNING: РАСПИСАНИЕ ПОСЛЕДНИЙ РАЗ ОБНОВЛЯЛОСЬ: {delta} ВРЕМЕНИ НАЗАД."
+                    text=f"WARNING: РАСПИСАНИЕ ПОСЛЕДНИЙ РАЗ ОБНОВЛЯЛОСЬ: {td_format(delta)} ВРЕМЕНИ НАЗАД."
                          f" АКТУАЛЬНОСТЬ РАСПИСАНИЯ ПОД ВОПРОСОМ, НАПИШИ ДАМИРУ ↓ https://t.me/damiraminov1"
                 )
                 await bot.send_message(
@@ -59,4 +77,5 @@ async def callback_handler(callback: types.CallbackQuery):
                     await bot.send_message(chat_id=callback.from_user.id, text=message)
         except BaseException:
             await bot.send_message(chat_id=callback.from_user.id,
-                                   text="Подожди 10 минут, если не заработает, то пиши Дамиру ↓ https://t.me/damiraminov1")
+                                   text="Подожди 10 минут, если не заработает,"
+                                        " то пиши Дамиру ↓ https://t.me/damiraminov1")
