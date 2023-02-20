@@ -21,14 +21,15 @@ def get_start_markup() -> types.ReplyKeyboardMarkup:
 
 @dp.message_handler(commands='start')
 async def start(message: types.Message):
-    await message.reply(
-        'Привет, Ксюшик❤️! Любое твое сообщение или кнопка - расписание',
-        reply_markup=get_start_markup())
+    if message.from_user.id == Config.OWN_ID:
+        await message.reply(
+            'Привет, Ксюшик❤️! Любое твое сообщение или кнопка - расписание',
+            reply_markup=get_start_markup())
 
 
 @dp.message_handler(content_types='text')
 async def callback_handler(callback: types.CallbackQuery):
-    if callback:
+    if callback and callback.from_user.id == Config.OWN_ID:
         with open("DATA.txt", "r") as text_file:
             loaded_str = text_file.read()
         tech_time = datetime.datetime.strptime(loaded_str.split('TECHNICAL INFO \n')[1], '%d-%b-%Y (%H:%M:%S.%f)')

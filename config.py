@@ -9,3 +9,4 @@ load_dotenv(os.path.join(basedir, '.env'))
 class Config(object):
     TOKEN = os.environ.get('BOT_TOKEN')
     URL = 'https://uspu.ru/education/eios/schedule/?group_name='
+    OWN_ID = os.environ.get('OWN_ID')
