@@ -13,7 +13,7 @@ dp = Dispatcher(bot)
 
 
 def user_has_permission(user_id: int) -> bool:
-    if user_id == Config.OWN_ID or user_id == Config.USER_ID:
+    if user_id == int(Config.OWN_ID) or user_id == int(Config.USER_ID):
         return True
 
 
