@@ -59,7 +59,7 @@ async def callback_handler(callback: types.CallbackQuery):
             tech_time = datetime.datetime.strptime(loaded_str.split('TECHNICAL INFO \n')[1], '%d-%b-%Y (%H:%M:%S.%f)')
             now = datetime.datetime.now()
             delta = now - tech_time
-            warning_notification = delta >= datetime.timedelta(minutes=7)
+            warning_notification = delta >= datetime.timedelta(minutes=20)
             if warning_notification:
                 await bot.send_message(
                     chat_id=callback.from_user.id,
