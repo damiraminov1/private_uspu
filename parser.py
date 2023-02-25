@@ -12,7 +12,7 @@ class Parser:
     def _get_html(url):
         session = HTMLSession()
         r = session.get(url=url)
-        r.html.render(timeout=420, sleep=300)
+        r.html.render(sleep=300)
         if Parser._server_is_respond(r):
             return r.html.html
         else:
